@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with daybreakrpg.  If not, see <http://www.gnu.org/licenses/>.
 
+import universal
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import sys
@@ -27,6 +28,16 @@ class InputWindow(QWidget):
     self.resize(300,300)
     self.setWindowTitle("When Day Breaks")
     self.show()
+  def keyPressEvent(self,event):
+    if type(event) == QKeyEvent:
+      if event.key() == Qt.Key_Backspace:
+        universal.backspaceTL()
+      else:
+        universal.appendToLog(event.text())
+      self.repaint()
+      event.accept()
+    else:
+      event.ignore()
   def paintEvent(self,event):
     painter = QPainter()
     painter.begin(self)
@@ -40,7 +51,19 @@ class InputWindow(QWidget):
     path.moveTo(10,10)
     font = QFont()
     font.setPixelSize(12)
-    path.addText(0,10,font,"Hello World!")
+
+    termlines = universal.getTermlog().splitlines()
+    pos = 10
+    h = self.height()
+    num = int((h - 10) / 12)
+    print(num)
+    print(len(termlines))
+    if num < len(termlines):
+      termlines = termlines[len(termlines) - num - 1:]
+    for line in termlines:
+        path.addText(0,pos,font,line)
+        pos += 12
+
     painter.drawPath(path)
 
     painter.end()
