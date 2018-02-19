@@ -15,9 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with daybreakrpg.  If not, see <http://www.gnu.org/licenses/>.
 
-newline = "\n"
+from threading import Timer
 
-termlog = "> "
+newline = "\n"
+inputMode = False
+termlog = "not_a_seagull presents:"
+
+def __func1__():
+  termlogNewLine()
+  appendToLog("SCP Originally created by shaggydredlocks")
+  t2 = Timer(3.0,setInput)
+  t2.start()
+
+
+
+def initTermlog():
+  t = Timer(3.0,__func1__)
+  t.start()
+
+# true = 1
+# false = 2
 
 def getTermlog():
     return termlog
@@ -30,10 +47,35 @@ def termlogNewLine():
     global termlog
     termlog += newline
 
-def backspaceTL():
+def getLastLineTL():
     global termlog
     termlines = termlog.splitlines()
     termline = termlines[len(termlines) - 1]
+    return termline
+
+def backspaceTL():
+    global termlog
+    termline = getLastLineTL()
     if termline == "> ":
       return;
     termlog = termlog[0:len(termlog) - 1]
+
+def getContentTL():
+    termline = getLastLineTL()
+    termcont = termline[2:len(termlog)]
+    return termcont
+
+def getInputMode():
+    global inputMode
+    return inputMode
+
+def setInput():
+    global inputMode
+    inputMode = True
+    termlogNewLine()
+    appendToLog("> ")
+
+def setOutput():
+    global inputMode
+    inputMode = False 
+

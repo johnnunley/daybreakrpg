@@ -16,8 +16,11 @@
 # along with daybreakrpg.  If not, see <http://www.gnu.org/licenses/>.
 
 import universal
+import interpreter
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from time import strftime
+from threading import Timer
 import sys
 
 class InputWindow(QWidget):
@@ -25,15 +28,25 @@ class InputWindow(QWidget):
     super(InputWindow,self).__init__()
     self.init()
   def init(self):
+    self.timer = QTimer(self)
+    self.timer.timeout.connect(self.forceARepaint)
+    self.timer.start(200)
+
     self.resize(300,300)
     self.setWindowTitle("When Day Breaks")
     self.show()
+    universal.initTermlog()
+  def forceARepaint(self):
+    self.repaint() 
   def keyPressEvent(self,event):
     if type(event) == QKeyEvent:
-      if event.key() == Qt.Key_Backspace:
-        universal.backspaceTL()
-      else:
-        universal.appendToLog(event.text())
+      if universal.getInputMode():
+        if event.key() == Qt.Key_Backspace:
+          universal.backspaceTL()
+        elif event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+          interpreter.interpret(universal.getContentTL())
+        else:
+          universal.appendToLog(event.text())
       self.repaint()
       event.accept()
     else:
@@ -85,6 +98,7 @@ class GameWindow(QWidget):
     painter.end()
 
 def main():
+  QCoreApplication.setAttribute(Qt.AA_X11InitThreads)
   app = QApplication(sys.argv)
   iw = InputWindow()
   gw = GameWindow()
